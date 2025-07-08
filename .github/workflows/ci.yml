@@ -45,7 +45,7 @@ jobs:
         with:
           envtag: staging
           aws_region: ${{ vars.AWS_REGION }}
-          oidc_role: ${{ vars.AWS_GITHUB_OIDC_ROLE }}
+          oidc_role: ${{ vars.OIDC_IAM_ROLE }}
 
   performance:
     name: Performance tests
@@ -76,6 +76,6 @@ jobs:
         with:
           envtag: production
           aws_region: ${{ vars.AWS_REGION }}
-          oidc_role: ${{ vars.AWS_GITHUB_OIDC_ROLE }}
+          oidc_role: ${{ vars.OIDC_IAM_ROLE }}
 
 

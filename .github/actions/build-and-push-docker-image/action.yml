@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 description: Builds docker image, logs in to ECR and pushes the new image to ECR
 inputs:
   aws_ecr:
-    description: "The ECR base url to push the image into (omit the redis-roaring image name)"
+    description: "The ECR base url to push the image into (omit the redis-roaring image name). Defaults to AWS Artifacts account."
     required: true
     default: "852894311366.dkr.ecr.us-west-2.amazonaws.com"
   aws_region:
@@ -12,7 +12,7 @@ inputs:
     description: "The environment for which we're building this image (used in tagging)"
     required: true
   oidc_role:
-    description: "The AWS IAM Role used to authenticate to AWS via IdentityCenter OIDC"
+    description: "The AWS IAM Role used to authenticate to AWS via IdentityCenter OIDC.  Should have push access to the aws_ecr value."
     type: string
     required: true
 runs:
