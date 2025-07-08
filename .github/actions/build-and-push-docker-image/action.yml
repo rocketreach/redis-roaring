@@ -4,33 +4,43 @@ inputs:
   aws_ecr:
     description: "The ECR base url to push the image into (omit the redis-roaring image name)"
     required: true
+    default: "852894311366.dkr.ecr.us-west-2.amazonaws.com"
   aws_region:
     description: "AWS region"
     default: "us-west-2"
+  environment:
+    description: "The environment for which we're building this image (used in tagging)"
+    required: true
   oidc_role:
+    description: "The AWS IAM Role used to authenticate to AWS via IdentityCenter OIDC"
     type: string
     required: true
 runs:
   using: "composite"
   steps:
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ inputs.oidc_role }}
-        role-session-name: GithubActions
+        role-session-name: GithubActionsRedisRoaring
         aws-region: ${{ inputs.aws_region }}
+
     - name: Login to Amazon ECR
       id: login_ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
+
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
+      uses: docker/setup-qemu-action@v3
+
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
         AWS_ECR: ${{ inputs.aws_ecr }}
+        ENVIRONMENT: ${{ inputs.environment }}
       run: |
-        docker build -t $AWS_ECR/redis-roaring:sha_$GITHUB_SHA .
+        docker build -t $AWS_ECR/redis-roaring:sha_$GITHUB_SHA -t $AWS_ECR/redis-roaring:${ENVIRONMENT} .
         docker push $AWS_ECR/redis-roaring --all-tags
       shell: bash
