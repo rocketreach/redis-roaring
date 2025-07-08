@@ -7,7 +7,7 @@
 #define realloc(p, sz) RedisModule_Realloc(p, sz)
 #define free(p) RedisModule_Free(p)
 
-#include "roaring.c"
+#include "roaring.h"
 
 static RedisModuleType* BitmapType;
 
@@ -260,7 +260,7 @@ int RStatBitCommand(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
   s = sdscatprintf(s, "\trun container values: %d\n", stat.n_values_run_containers);
   s = sdscatprintf(s, "\trun container bytes: %d\n", stat.n_bytes_run_containers);
 
-  RedisModule_ReplyWithSimpleString(ctx, s);
+  RedisModule_ReplyWithVerbatimString(ctx, s, sdslen(s));
   sdsfree(s);
 
   return REDISMODULE_OK;
