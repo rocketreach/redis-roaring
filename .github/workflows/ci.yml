@@ -14,36 +14,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Configure
       run: ./configure.sh
+
   test:
     name: Test project
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Configure
       run: ./configure.sh
     - name: Install valgrind
       run: sudo apt-get install valgrind
     - name: Test
       run: ./test.sh
+
   build_and_push_staging:
     name: Build and push to ECR (Staging)
     needs: [configure, test]
     if: github.ref != 'refs/heads/master'
-    environment: staging
+    environment: artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build and Push Docker Image
         uses: ./.github/actions/build-and-push-docker-image
         with:
-          aws_ecr: ${{ vars.AWS_ECR }}
+          envtag: staging
           aws_region: ${{ vars.AWS_REGION }}
-          oidc_role: ${{ vars.AWS_GITHUB_OIDC_ROLE }}
+          oidc_role: ${{ vars.OIDC_IAM_ROLE }}
+
   performance:
     name: Performance tests
     needs: [configure, test]
@@ -51,27 +54,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure
         run: ./configure.sh
       - name: Install valgrind
         run: sudo apt-get install valgrind
       - name: Test
         run: ./performance.sh
+
   build_and_push_production:
     name: Build and push to ECR (Production)
     needs: [configure, test, performance]
     if: github.ref == 'refs/heads/master'
-    environment: production
+    environment: artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build and Push Docker Image
         uses: ./.github/actions/build-and-push-docker-image
         with:
-          aws_ecr: ${{ vars.AWS_ECR }}
+          envtag: production
           aws_region: ${{ vars.AWS_REGION }}
-          oidc_role: ${{ vars.AWS_GITHUB_OIDC_ROLE }}
+          oidc_role: ${{ vars.OIDC_IAM_ROLE }}
 
 
