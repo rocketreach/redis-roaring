@@ -35,7 +35,7 @@ jobs:
     name: Build and push to ECR (Staging)
     needs: [configure, test]
     if: github.ref != 'refs/heads/master'
-    environment: staging
+    environment: artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,7 +43,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: ./.github/actions/build-and-push-docker-image
         with:
-          environment: staging
+          envtag: staging
           aws_region: ${{ vars.AWS_REGION }}
           oidc_role: ${{ vars.AWS_GITHUB_OIDC_ROLE }}
 
@@ -66,7 +66,7 @@ jobs:
     name: Build and push to ECR (Production)
     needs: [configure, test, performance]
     if: github.ref == 'refs/heads/master'
-    environment: production
+    environment: artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -74,7 +74,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: ./.github/actions/build-and-push-docker-image
         with:
-          environment: production
+          envtag: production
           aws_region: ${{ vars.AWS_REGION }}
           oidc_role: ${{ vars.AWS_GITHUB_OIDC_ROLE }}
 

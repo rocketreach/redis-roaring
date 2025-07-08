@@ -8,7 +8,7 @@ inputs:
   aws_region:
     description: "AWS region"
     default: "us-west-2"
-  environment:
+  envtag:
     description: "The environment for which we're building this image (used in tagging)"
     required: true
   oidc_role:
@@ -39,8 +39,8 @@ runs:
       id: build-image
       env:
         AWS_ECR: ${{ inputs.aws_ecr }}
-        ENVIRONMENT: ${{ inputs.environment }}
+        ENV_TAG: ${{ inputs.envtag }}
       run: |
-        docker build -t $AWS_ECR/redis-roaring:sha_$GITHUB_SHA -t $AWS_ECR/redis-roaring:${ENVIRONMENT} .
+        docker build -t $AWS_ECR/redis-roaring:sha_$GITHUB_SHA -t $AWS_ECR/redis-roaring:${ENV_TAG} .
         docker push $AWS_ECR/redis-roaring --all-tags
       shell: bash
